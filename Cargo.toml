@@ -11,5 +11,8 @@ anyhow = "1"
 quote = "1"
 syn = "1"
 
+[dev-dependencies]
+actix-rt = "1"
+
 [lib]
 proc-macro = true
