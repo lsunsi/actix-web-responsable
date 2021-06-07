@@ -1,0 +1,27 @@
+name: Responsable checks
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  cargo-test:
+    runs-on: ubuntu-latest
+    container: rust:1.51-slim-buster
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: cargo-${{ hashFiles('Cargo.lock') }}
+
+      - name: Build and test project
+        run: cargo test
