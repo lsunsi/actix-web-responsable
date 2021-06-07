@@ -90,8 +90,8 @@ fn render(ident: Ident, variants: Vec<ParsedVariant>) -> TokenStream {
     })
 }
 
-#[proc_macro_derive(Responsable, attributes(status_code))]
-pub fn derive_responsable(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(Responder, attributes(status_code))]
+pub fn derive_responsable_responder(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let (ident, variants) = parse(input).expect("Failed parsing of Responsable");
     render(ident, variants)

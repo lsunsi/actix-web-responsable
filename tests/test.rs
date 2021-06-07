@@ -1,8 +1,7 @@
 use actix_web::{get, http::StatusCode, test, web, App};
-use actix_web_responsable::Responsable;
 use web::Path;
 
-#[derive(Responsable)]
+#[derive(actix_web_responsable::Responder)]
 enum Response {
     #[status_code(200)]
     Yay(String),
