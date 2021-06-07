@@ -1,0 +1,7 @@
+[package]
+name = "actix-web-responsable"
+version = "0.1.0"
+authors = ["lsunsi <sunsi.lucas@gmail.com>", "FelipeRosa <felipe.sgrosa@gmail.com>"]
+edition = "2018"
+
+[dependencies]
