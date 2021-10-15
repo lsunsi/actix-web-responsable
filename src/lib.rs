@@ -1,11 +1,9 @@
-use actix_web::http::StatusCode;
-use anyhow::{anyhow, bail, Context};
+use anyhow::bail;
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, DeriveInput, Ident};
 
 struct ParsedVariant {
-    status_code: StatusCode,
     with_body: bool,
     ident: Ident,
 }
@@ -23,22 +21,6 @@ fn parse(input: DeriveInput) -> anyhow::Result<(Ident, Vec<ParsedVariant>)> {
     for variant in data.variants {
         let ident = variant.ident;
 
-        let attr = variant
-            .attrs
-            .iter()
-            .find(|a| a.path.is_ident("status_code"))
-            .ok_or(anyhow!(
-                "Attribute #[status_code] is required on each variant"
-            ))?;
-
-        let litint = attr
-            .parse_args::<syn::LitInt>()
-            .context("Status code value must be an integer literal")?;
-
-        let status_code = litint
-            .base10_parse::<StatusCode>()
-            .context("Status code integer must be parsed into StatusCode")?;
-
         let with_body = match variant.fields {
             syn::Fields::Unnamed(fs) if fs.unnamed.len() == 1 => true,
             syn::Fields::Unnamed(_) => {
@@ -50,11 +32,7 @@ fn parse(input: DeriveInput) -> anyhow::Result<(Ident, Vec<ParsedVariant>)> {
             syn::Fields::Unit => false,
         };
 
-        parsed.push(ParsedVariant {
-            status_code,
-            with_body,
-            ident,
-        });
+        parsed.push(ParsedVariant { with_body, ident });
     }
 
     Ok((input.ident, parsed))
@@ -62,16 +40,15 @@ fn parse(input: DeriveInput) -> anyhow::Result<(Ident, Vec<ParsedVariant>)> {
 
 fn render(ident: Ident, variants: Vec<ParsedVariant>) -> TokenStream {
     let vars = variants.into_iter().map(|parsed| {
-        let code = parsed.status_code.as_u16();
         let name = parsed.ident;
 
         if parsed.with_body {
             quote! {
-                #ident::#name(body) => actix_web::HttpResponse::build(actix_web::http::StatusCode::from_u16(#code).unwrap()).json(body),
+                #ident::#name(body) => actix_web::HttpResponse::#name().json(body),
             }
         } else {
             quote! {
-                #ident::#name => actix_web::HttpResponse::build(actix_web::http::StatusCode::from_u16(#code).unwrap()).finish(),
+                #ident::#name => actix_web::HttpResponse::#name().finish(),
             }
         }
     });

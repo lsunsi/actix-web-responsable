@@ -1,18 +1,18 @@
 # *actix-web* Responsable
 
 ```rust
-use actix_web_responsable::Responsable;
+use actix_web_responsable::Responder;
 
+#[derive(Responder)]
 enum MyResponse {
-	#[status_code = 200]
-	Success(String),
-	#[status_code = 401]
-	UnexpectedUser,
+	Ok(String),
+	Unauthorized,
+	InternalServerError,
 }
 
-#[actix_web::get]
+#[actix_web::get("/")]
 async fn get() -> MyResponse {
-	MyResponse::Success("yay")
+	MyResponse::Ok("yay".to_owned())
 }
 
 ```
