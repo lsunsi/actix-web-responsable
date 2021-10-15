@@ -1,22 +1,20 @@
 use actix_web::{get, http::StatusCode, test, web, App};
+use actix_web_responsable::Responder;
 use web::Path;
 
-#[derive(actix_web_responsable::Responder)]
+#[derive(Responder)]
 enum Response {
-    #[status_code(200)]
-    Yay(String),
-    #[status_code(400)]
-    Meh(u16),
-    #[status_code(500)]
-    Nay,
+    Ok(String),
+    BadRequest(u16),
+    InternalServerError,
 }
 
 #[get("/{a}")]
 async fn route(Path((a,)): Path<(String,)>) -> Response {
     match a.as_ref() {
-        "si" => Response::Yay("sim".to_owned()),
-        "no" => Response::Nay,
-        _ => Response::Meh(5),
+        "si" => Response::Ok("sim".to_owned()),
+        "no" => Response::InternalServerError,
+        _ => Response::BadRequest(5),
     }
 }
 
