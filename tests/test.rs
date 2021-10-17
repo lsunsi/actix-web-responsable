@@ -10,8 +10,8 @@ enum Response {
 }
 
 #[get("/{a}")]
-async fn route(Path((a,)): Path<(String,)>) -> Response {
-    match a.as_ref() {
+async fn route(path: Path<String>) -> Response {
+    match path.as_str() {
         "si" => Response::Ok("sim".to_owned()),
         "no" => Response::InternalServerError,
         _ => Response::BadRequest(5),

@@ -55,13 +55,10 @@ fn render(ident: Ident, variants: Vec<ParsedVariant>) -> TokenStream {
 
     TokenStream::from(quote! {
         impl actix_web::Responder for #ident {
-            type Future = futures::future::Ready<Result<actix_web::HttpResponse, Self::Error>>;
-            type Error = ();
-
-            fn respond_to(self, req: &actix_web::HttpRequest) -> Self::Future {
-                futures::future::ready(Ok(match self {
+            fn respond_to(self, req: &actix_web::HttpRequest) -> actix_web::HttpResponse {
+                match self {
                     #(#vars)*
-                }))
+                }
             }
         }
     })
